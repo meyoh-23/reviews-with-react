@@ -6,6 +6,25 @@ function App() {
   const [people, setPeople] = useState(data);
   const [index, setIndex] = useState(0);
 
+  // to check for the index's for the extremes and enable contionues looping
+useEffect(() => {
+  const lastIndex = people.length -1;
+  if (index < 0) {
+    setIndex(lastIndex);
+  }
+  if (index > lastIndex) {
+    setIndex(0);
+  }
+},[index, people])
+
+// for the auto-slide functionality
+useEffect(() => { 
+  let slider = setInterval(() => {
+    setIndex(index + 1);
+  }, 3000);
+  return () =>clearInterval(slider);
+}, [index])
+
   return (
   <section className='section'>
     <div className='title'>
@@ -18,9 +37,15 @@ function App() {
         people.map((person, personIndex) => {
           const {id, image, name, title, quote} = person;
           // more functionality to be added in a bit
-
+          let position = 'nextSlide';
+          if (personIndex === index) {
+            position = 'activeSlide'
+          }
+          if (personIndex === index - 1 || (index === 0 && personIndex === people.length - 1)) {
+            position = 'lastSlide';
+          }
           return ( 
-            <article key={id}>
+            <article key={id} className={position}>
               <img src={image} alt={name} className='person-img'/>
               <h4>{name}</h4>
               <p className='title'>{title}</p>
@@ -30,10 +55,10 @@ function App() {
           )
         })
       }
-      <button className='prev'>
+      <button className='prev' onClick={()=>setIndex(index - 1)}>
         <FiChevronLeft/>
       </button>
-      <button className='next'>
+      <button className='next' onClick={()=>setIndex(index + 1)}>
         <FiChevronRight/>
       </button>
     </div>
